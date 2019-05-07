@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Response } from '@angular/http';
+
 import { ServerService } from './server.service';
 
 @Component({
@@ -7,7 +8,8 @@ import { ServerService } from './server.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
+  appName = this.serverService.getAppName();
   servers = [
     {
       name: 'Testserver',
@@ -18,34 +20,29 @@ export class AppComponent implements OnInit {
       name: 'Liveserver',
       capacity: 100,
       id: this.generateId()
-    },
-    {
-      name: 'Preprodserver',
-      capacity: 300,
-      id: this.generateId()
     }
   ];
-
   constructor(private serverService: ServerService) {}
-  ngOnInit() {
-      this.serverService.getServers()
-                      .subscribe(
-                        (response: Response) => {
-                          console.log(response);
-                        });
-  }
-  onAddServer(name: string, capacity: number) {
+  onAddServer(name: string) {
     this.servers.push({
       name: name,
-      capacity: capacity,
+      capacity: 50,
       id: this.generateId()
     });
-    this.serverService.storeServers(this.servers)
-                      .subscribe((response) => console.log(response));
   }
-  onAddServers() {
+  onSave() {
     this.serverService.storeServers(this.servers)
-                      .subscribe((response) => console.log(response));
+      .subscribe(
+        (response) => console.log(response),
+        (error) => console.log(error)
+      );
+  }
+  onGet() {
+    this.serverService.getServers()
+      .subscribe(
+        (servers: any[]) => this.servers = servers,
+        (error) => console.log(error)
+      );
   }
   private generateId() {
     return Math.round(Math.random() * 10000);
